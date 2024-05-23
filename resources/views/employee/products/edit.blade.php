@@ -87,9 +87,9 @@
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700 dark:text-gray-300">Current Images:</label>
-                    <div class="grid grid-cols-3 gap-1">
+                    <div class="grid grid-cols-10 gap-1 mt-2">
                         @foreach ($product->images as $image)
-                            <div class="relative">
+                            <div class="relative mt-2">
                                 <img
                                     src="{{ asset('storage/' . $image->image_path) }}"
                                     alt="Product Image"
@@ -98,7 +98,7 @@
                                 <button
                                     id="deleteImageButton-{{ $image->id }}"
                                     type="button"
-                                    class="bg-blue-600 text-white rounded-full p-1 ml-20"
+                                    class="bg-red-600 text-white rounded-full p-1 ml-20"
                                     onclick="removeImage({{ $image->id }})"
                                 >
                                     Delete
