@@ -158,6 +158,7 @@ class ProductController extends Controller
         // Delete the image file from storage
         Storage::delete('public/' . $image->image_path);
 
+
         // Delete the image record from the database
         $image->delete();
 
@@ -177,5 +178,7 @@ class ProductController extends Controller
 
         return redirect()->route('employee.products.index')->with('success', 'Product deleted successfully.');
     }
+
+
 }
 

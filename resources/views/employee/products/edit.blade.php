@@ -87,32 +87,42 @@
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700 dark:text-gray-300">Current Images:</label>
-                    <div class="grid grid-cols-3 gap-4">
+                    <div class="grid grid-cols-3 gap-1">
                         @foreach ($product->images as $image)
                             <div class="relative">
-                                <img src="{{ asset('storage/' . $image->image_path) }}" alt="Product Image"
-                                    class="w-32 h-32 object-cover">
-                                <form action="{{ route('employee.products.destroyImage', $image->id) }}" method="POST"
-                                    class="absolute top-0 right-0">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="bg-red-600 text-white rounded-full p-1 ml-20"
-                                        onclick="return confirm('Are you sure you want to delete this image?');">Delete</button>
-                                </form>
+                                <img
+                                    src="{{ asset('storage/' . $image->image_path) }}"
+                                    alt="Product Image"
+                                    class="w-32 h-32 object-cover"
+                                >
+                                <button
+                                    id="deleteImageButton-{{ $image->id }}"
+                                    type="button"
+                                    class="bg-blue-600 text-white rounded-full p-1 ml-20"
+                                    onclick="removeImage({{ $image->id }})"
+                                >
+                                    Delete
+                                </button>
                                 @if ($image->is_main)
-                                    <span
-                                        class="absolute bottom-0 left-0 bg-gray-600 text-white px-2 py-1 rounded-tr-md">Main</span>
+                                    <span class="absolute bottom-0 left-0 bg-gray-600 text-white px-2 py-1 rounded-tr-md">Main</span>
                                 @endif
                             </div>
                         @endforeach
                     </div>
                 </div>
 
-                <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Update
-                    Product</button>
+                <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                    Update Product
+                </button>
             </form>
         </div>
     </div>
+    @foreach ($product->images as $image)
+        <form id="deleteImageForm-{{ $image->id }}" action="{{ route('employee.products.destroyImage', $image->id) }}" method="POST">
+            @csrf
+            @method('DELETE')
+        </form>
+    @endforeach
 
     <script>
         document.getElementById('add-specification').addEventListener('click', function() {
@@ -137,5 +147,16 @@
                 event.target.parentElement.remove();
             }
         });
+
+        const removeImage = function(imageId) {
+            const isConfirmed = confirm('Are you sure you want to delete this image?');
+            
+            if (!isConfirmed) {
+                return;
+            }
+
+            const form = document.getElementById(`deleteImageForm-${imageId}`);
+            form.submit();
+        }
     </script>
 @endsection
