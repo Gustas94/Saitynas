@@ -7,7 +7,8 @@
         <div class="w-5/6 p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
             <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Edit Product</h1>
 
-            <form action="{{ route('employee.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+            <form id="update-product-form" action="{{ route('employee.products.update', $product->id) }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="mb-4">
@@ -76,6 +77,32 @@
                         value="{{ $product->price }}" required step="0.01">
                 </div>
                 <div class="mb-4">
+                    <label for="hasDiscount" class="block text-gray-700 dark:text-gray-300">Has Discount:</label>
+                    <select name="hasDiscount" id="hasDiscount"
+                        class="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200">
+                        <option value="0" {{ !$product->hasDiscount ? 'selected' : '' }}>No</option>
+                        <option value="1" {{ $product->hasDiscount ? 'selected' : '' }}>Yes</option>
+                    </select>
+
+                </div>
+                <div class="mb-4" id="discount-container"
+                    style="display: {{ $product->hasDiscount ? 'block' : 'none' }};">
+                    <label for="discount_percentage" class="block text-gray-700 dark:text-gray-300">Discount
+                        Percentage:</label>
+                    <input type="number" name="discount_percentage" id="discount_percentage"
+                        class="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200"
+                        value="{{ $product->discount ? $product->discount->discount_percentage : '' }}" step="0.01"
+                        min="0" max="100">
+                </div>
+                <div class="mb-4" id="new-price-container"
+                    style="display: {{ $product->hasDiscount ? 'block' : 'none' }};">
+                    <label for="new_price" class="block text-gray-700 dark:text-gray-300">New Price:</label>
+                    <input type="number" name="new_price" id="new_price"
+                        class="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200"
+                        value="{{ $product->discount ? $product->price - ($product->price * $product->discount->discount_percentage) / 100 : '' }}"
+                        step="0.01" readonly>
+                </div>
+                <div class="mb-4">
                     <label for="images" class="block text-gray-700 dark:text-gray-300">Images:</label>
                     <input type="file" name="images[]" id="images"
                         class="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200"
@@ -90,35 +117,32 @@
                     <div class="grid grid-cols-10 gap-1 mt-2">
                         @foreach ($product->images as $image)
                             <div class="relative mt-2">
-                                <img
-                                    src="{{ asset('storage/' . $image->image_path) }}"
-                                    alt="Product Image"
-                                    class="w-32 h-32 object-cover"
-                                >
-                                <button
-                                    id="deleteImageButton-{{ $image->id }}"
-                                    type="button"
+                                <img src="{{ asset('storage/' . $image->image_path) }}" alt="Product Image"
+                                    class="w-32 h-32 object-cover">
+                                <button id="deleteImageButton-{{ $image->id }}" type="button"
                                     class="bg-red-600 text-white rounded-full p-1 ml-20"
-                                    onclick="removeImage({{ $image->id }})"
-                                >
+                                    onclick="removeImage({{ $image->id }})">
                                     Delete
                                 </button>
                                 @if ($image->is_main)
-                                    <span class="absolute bottom-0 left-0 bg-gray-600 text-white px-2 py-1 rounded-tr-md">Main</span>
+                                    <span
+                                        class="absolute bottom-0 left-0 bg-gray-600 text-white px-2 py-1 rounded-tr-md">Main</span>
                                 @endif
                             </div>
                         @endforeach
                     </div>
                 </div>
 
-                <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                <button type="button" id="updateProductButton"
+                    class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
                     Update Product
                 </button>
             </form>
         </div>
     </div>
     @foreach ($product->images as $image)
-        <form id="deleteImageForm-{{ $image->id }}" action="{{ route('employee.products.destroyImage', $image->id) }}" method="POST">
+        <form id="deleteImageForm-{{ $image->id }}"
+            action="{{ route('employee.products.destroyImage', $image->id) }}" method="POST">
             @csrf
             @method('DELETE')
         </form>
@@ -150,7 +174,7 @@
 
         const removeImage = function(imageId) {
             const isConfirmed = confirm('Are you sure you want to delete this image?');
-            
+
             if (!isConfirmed) {
                 return;
             }
@@ -158,5 +182,50 @@
             const form = document.getElementById(`deleteImageForm-${imageId}`);
             form.submit();
         }
+
+        // Show/hide discount percentage input field
+        // Show/hide discount percentage input field
+        const hasDiscountSelect = document.getElementById('hasDiscount');
+        const discountContainer = document.getElementById('discount-container');
+        const discountPercentageInput = document.getElementById('discount_percentage');
+        const newPriceContainer = document.getElementById('new-price-container');
+        const newPriceInput = document.getElementById('new_price');
+        const priceInput = document.getElementById('price');
+
+        hasDiscountSelect.addEventListener('change', function() {
+            if (this.value === '1') {
+                discountContainer.style.display = 'block';
+                newPriceContainer.style.display = 'block';
+            } else {
+                discountContainer.style.display = 'none';
+                newPriceContainer.style.display = 'none';
+                discountPercentageInput.value = '';
+                newPriceInput.value = '';
+            }
+        });
+
+        // Dynamically update the new price based on discount percentage
+        discountPercentageInput.addEventListener('input', function() {
+            const originalPrice = parseFloat(priceInput.value);
+            const discountPercentage = parseFloat(this.value);
+            if (!isNaN(discountPercentage) && discountPercentage >= 0 && discountPercentage <= 100) {
+                const discountedPrice = originalPrice - (originalPrice * (discountPercentage / 100));
+                newPriceInput.value = discountedPrice.toFixed(2);
+            } else {
+                newPriceInput.value = '';
+            }
+        });
+
+        // JavaScript to handle the update form submission
+        const updateProductButton = document.getElementById('updateProductButton');
+        const updateProductForm = document.getElementById('update-product-form');
+
+        updateProductButton.addEventListener('click', function() {
+            const isConfirmed = confirm('Are you sure you want to update this product?');
+            if (!isConfirmed) {
+                return;
+            }
+            updateProductForm.submit();
+        });
     </script>
 @endsection

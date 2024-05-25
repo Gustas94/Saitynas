@@ -5,74 +5,86 @@
     @include('components.employee-sidebar')
 
     <div class="w-5/6 p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
-        <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Manage Products</h1>
-        <a href="{{ route('employee.products.create') }}" class="mb-4 inline-block px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Add New Product</a>
+        <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Products</h1>
 
-        <!-- Filters -->
-        <div class="mb-4 flex items-center">
-            <form method="GET" action="{{ route('employee.products.index') }}" class="flex space-x-4">
-                <div>
-                    <label for="category" class="block text-gray-700 dark:text-gray-300 mb-2">Filter by Category:</label>
-                    <select name="category" id="category" class="p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200" onchange="this.form.submit()">
-                        <option value="all">All Categories</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->category }}" {{ request('category') == $category->category ? 'selected' : '' }}>{{ ucfirst($category->category) }}</option>
-                        @endforeach
-                    </select>
+        <!-- Search and Filter Form -->
+        <div class="mb-4">
+            <form method="GET" action="{{ route('employee.products.index') }}">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+                        <select name="category" id="category" class="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200">
+                            <option value="all">All</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->category }}" {{ request('category') == $category->category ? 'selected' : '' }}>
+                                    {{ ucfirst($category->category) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Search</label>
+                        <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Search..." class="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200">
+                    </div>
+                    <div>
+                        <label for="sort_by" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sort By</label>
+                        <select name="sort_by" id="sort_by" class="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200">
+                            <option value="name" {{ request('sort_by') == 'name' ? 'selected' : '' }}>Name</option>
+                            <option value="price" {{ request('sort_by') == 'price' ? 'selected' : '' }}>Price</option>
+                            <option value="category" {{ request('sort_by') == 'category' ? 'selected' : '' }}>Category</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="order" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Order</label>
+                        <select name="order" id="order" class="w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:text-gray-200">
+                            <option value="asc" {{ request('order') == 'asc' ? 'selected' : '' }}>Ascending</option>
+                            <option value="desc" {{ request('order') == 'desc' ? 'selected' : '' }}>Descending</option>
+                        </select>
+                    </div>
                 </div>
-                <input type="hidden" name="sort_by" value="{{ $sort_by }}">
-                <input type="hidden" name="order" value="{{ $order }}">
+                <div class="flex justify-end">
+                    <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Filter</button>
+                </div>
             </form>
         </div>
 
-        <table class="min-w-full bg-white dark:bg-gray-800">
+        <!-- Products Table -->
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                    @php
-                        $next_order = $order == 'asc' ? 'desc' : 'asc';
-                    @endphp
-                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        <a href="{{ route('employee.products.index', ['sort_by' => 'id', 'order' => $next_order, 'category' => request('category')]) }}">ID</a>
-                    </th>
-                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        <a href="{{ route('employee.products.index', ['sort_by' => 'name', 'order' => $next_order, 'category' => request('category')]) }}">Name</a>
-                    </th>
-                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        <a href="{{ route('employee.products.index', ['sort_by' => 'category', 'order' => $next_order, 'category' => request('category')]) }}">Category</a>
-                    </th>
-                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        <a href="{{ route('employee.products.index', ['sort_by' => 'price', 'order' => $next_order, 'category' => request('category')]) }}">Price</a>
-                    </th>
-                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Delete</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Image</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Category</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
             <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                @foreach($products as $product)
-                    <tr>
-                        <td class="py-4 px-4 text-sm font-medium text-gray-900 dark:text-gray-100">{{ $product->id }}</td>
-                        <td class="py-4 px-4 text-sm text-gray-500 dark:text-gray-300">{{ $product->name }}</td>
-                        <td class="py-4 px-4 text-sm text-gray-500 dark:text-gray-300">{{ $product->category }}</td>
-                        <td class="py-4 px-4 text-sm text-gray-500 dark:text-gray-300">{{ $product->price }}</td>
-                        <td class="py-4 px-4 text-sm">
-                            <div class="flex space-x-2">
-                                <a href="{{ route('employee.products.show', $product->id) }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700">Show</a>
-                                <a href="{{ route('employee.products.edit', $product->id) }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-gray-500 hover:bg-gray-600">Edit</a>
-                            </div>
-                        </td>
-                        <td class="py-4 px-4 text-sm">
-                            <form action="{{ route('employee.products.destroy', $product->id) }}" method="POST" class="inline-block">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700" onclick="return confirm('Are you sure you want to delete this product?');">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
+                @foreach ($products as $product)
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        @if($product->mainImage)
+                        <img src="{{ asset('storage/' . $product->mainImage->image_path) }}" alt="Product Image" class="w-32 h-32 object-contain">
+                        @else
+                        <img src="{{ asset('storage/images/image_missing.png') }}" alt="Image Missing" class="w-32 h-32 object-contain">
+                        @endif
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ Str::limit($product->name, 80) }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900 dark:text-gray-200">{{ $product->category }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900 dark:text-gray-200">{{ $product->price }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a href="{{ route('employee.products.edit', $product->id) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900">Edit</a>
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
-
-        <!-- Pagination Links -->
         <div class="mt-4">
             {{ $products->appends(request()->query())->links() }}
         </div>

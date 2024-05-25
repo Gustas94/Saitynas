@@ -4,65 +4,93 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use App\Models\ProductImage;
+
 class ProductController extends Controller
 {
-    public function index()
+    public function showPhones(Request $request)
     {
-        $products = Product::all();
-        return view('products.index', compact('products'));
+        $query = Product::where('category', 'phones')->with('mainImage');
+        $request->session()->put('previous_url', url()->full());
+
+        // Filter by price
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        // Filter by name
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        // Sorting
+        $sort_by = $request->get('sort_by', 'name');
+        $order = $request->get('order', 'asc');
+        $query->orderBy($sort_by, $order);
+
+        $products = $query->paginate(30);
+        return view('products.show.phones', compact('products'));
     }
 
-    public function create()
+    public function showMonitors(Request $request)
     {
-        return view('products.create');
+        $query = Product::where('category', 'monitors')->with('mainImage');
+        $request->session()->put('previous_url', url()->full());
+
+        // Filter by price
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
+        // Filter by name
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        // Sorting
+        $sort_by = $request->get('sort_by', 'name');
+        $order = $request->get('order', 'asc');
+        $query->orderBy($sort_by, $order);
+
+        $products = $query->paginate(30);
+        return view('products.show.monitors', compact('products'));
     }
 
-    public function store(Request $request)
+    public function showHeadphones(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'category' => 'required',
-            'description' => 'nullable',
-            'specifications' => 'nullable|json',
-            'price' => 'required|numeric',
-        ]);
+        $query = Product::where('category', 'headphones')->with('mainImage');
+        $request->session()->put('previous_url', url()->full());
 
-        Product::create($request->all());
+        // Filter by price
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
 
-        return redirect()->route('products.index')->with('success', 'Product created successfully.');
+        // Filter by name
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        // Sorting
+        $sort_by = $request->get('sort_by', 'name');
+        $order = $request->get('order', 'asc');
+        $query->orderBy($sort_by, $order);
+
+        $products = $query->paginate(30);
+        return view('products.show.headphones', compact('products'));
     }
 
-    public function show(Product $product)
+    public function show(Product $product, Request $request)
     {
-        return view('products.show', compact('product'));
-    }
-
-    public function edit(Product $product)
-    {
-        return view('products.edit', compact('product'));
-    }
-
-    public function update(Request $request, Product $product)
-    {
-        $request->validate([
-            'name' => 'required',
-            'category' => 'required',
-            'description' => 'nullable',
-            'specifications' => 'nullable|json',
-            'price' => 'required|numeric',
-        ]);
-
-        $product->update($request->all());
-
-        return redirect()->route('products.index')->with('success', 'Product updated successfully.');
-    }
-
-    public function destroy(Product $product)
-    {
-        $product->delete();
-
-        return redirect()->route('products.index')->with('success', 'Product deleted successfully.');
+        $previousUrl = $request->session()->get('previous_url');
+        return view('products.show', compact('product', 'previousUrl'));
     }
 }

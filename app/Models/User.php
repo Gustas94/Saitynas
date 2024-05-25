@@ -63,4 +63,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Hobbies::class, 'user_hobby', 'user_id', 'hobby_id');
     }
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
 }

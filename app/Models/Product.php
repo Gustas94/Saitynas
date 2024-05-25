@@ -10,7 +10,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'category', 'description', 'specifications', 'price'
+        'name', 'category', 'description', 'specifications', 'price', 'hasDiscount'
     ];
 
     public function images()
@@ -21,5 +21,10 @@ class Product extends Model
     public function mainImage()
     {
         return $this->hasOne(ProductImage::class)->where('is_main', true);
+    }
+
+    public function discount()
+    {
+        return $this->hasOne(Discount::class);
     }
 }

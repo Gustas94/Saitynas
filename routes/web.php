@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Employee\ProductController as EmployeeProductController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -18,6 +19,19 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/', function () {
+    return view('index');
+})->middleware(['auth', 'verified'])->name('index');
+
+Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
+Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+
+Route::get('/products/headphones', [ProductController::class, 'showHeadphones'])->name('products.headphones');
+Route::get('/products/monitors', [ProductController::class, 'showMonitors'])->name('products.monitors');
+Route::get('/products/phones', [ProductController::class, 'showPhones'])->name('products.phones');
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
 Route::middleware('auth')->group(function () {
     // Profile Routes
@@ -57,3 +71,4 @@ Route::middleware('auth')->group(function () {
 Route::get('/api/cities', [CityController::class, 'index']);
 
 require __DIR__ . '/auth.php';
+
