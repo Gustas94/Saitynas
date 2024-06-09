@@ -93,4 +93,21 @@ class ProductController extends Controller
         $previousUrl = $request->session()->get('previous_url');
         return view('products.show', compact('product', 'previousUrl'));
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $products = Product::where('name', 'like', '%' . $query . '%')->paginate(30);
+
+        return view('products.show.search', compact('products', 'query'));
+    }
+
+    public function showDiscountedProducts()
+    {
+        $products = Product::whereHas('discount', function ($query) {
+            $query->where('discount_percentage', '>', 0);
+        })->with('mainImage', 'discount')->paginate(30);
+
+        return view('index', compact('products'));
+    }
 }

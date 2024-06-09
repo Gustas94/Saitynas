@@ -12,25 +12,20 @@ use App\Http\Controllers\Employee\ProductController as EmployeeProductController
 use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [ProductController::class, 'showDiscountedProducts'])->name('index');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/', function () {
-    return view('index');
-})->middleware(['auth', 'verified'])->name('index');
-
-Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
 Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
+Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
 Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 
 Route::get('/products/headphones', [ProductController::class, 'showHeadphones'])->name('products.headphones');
 Route::get('/products/monitors', [ProductController::class, 'showMonitors'])->name('products.monitors');
 Route::get('/products/phones', [ProductController::class, 'showPhones'])->name('products.phones');
+Route::get('/products/search', [ProductController::class, 'search'])->name('products.search'); // Make sure this is outside the auth middleware group
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
 Route::middleware('auth')->group(function () {
@@ -49,7 +44,7 @@ Route::middleware('auth')->group(function () {
     // Countries Routes
     Route::resource('countries', CountriesController::class);
 
-    Route::resource('products', ProductController::class);
+    Route::resource('products', ProductController::class)->except(['index', 'show', 'search']); // Exclude routes that are outside the auth middleware
 
     // Admin User Management Routes
     Route::middleware('role:Administrator')->prefix('admin')->name('admin.')->group(function () {
@@ -71,4 +66,3 @@ Route::middleware('auth')->group(function () {
 Route::get('/api/cities', [CityController::class, 'index']);
 
 require __DIR__ . '/auth.php';
-
