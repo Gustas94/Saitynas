@@ -8,7 +8,7 @@
         <!-- Sidebar -->
         <div class="w-1/4 p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
             <h2 class="text-lg font-bold mb-4 text-gray-900 dark:text-gray-100">Search & Sort</h2>
-            <form method="GET" action="{{ route('products.headphones') }}">
+            <form method="GET" action="{{ route('products.phones') }}">
                 <input type="hidden" name="previous_url" value="{{ url()->full() }}">
                 <div class="mb-4">
                     <label for="min_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Min Price</label>
@@ -35,10 +35,10 @@
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Image</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            <a href="{{ route('products.headphones', array_merge(request()->query(), ['sort_by' => 'name', 'order' => request('order') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
+                            <a href="{{ route('products.phones', array_merge(request()->query(), ['sort_by' => 'name', 'order' => request('order') == 'asc' ? 'desc' : 'asc'])) }}">Name</a>
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            <a href="{{ route('products.headphones', array_merge(request()->query(), ['sort_by' => 'price', 'order' => request('order') == 'asc' ? 'desc' : 'asc'])) }}">Price</a>
+                            <a href="{{ route('products.phones', array_merge(request()->query(), ['sort_by' => 'price', 'order' => request('order') == 'asc' ? 'desc' : 'asc'])) }}">Price</a>
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -54,7 +54,7 @@
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{{ route('products.show', $product->id) }}" class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ Str::limit($product->name, 80) }}</a>
+                            <a href="{{ route('products.show', $product->id) }}" class="text-sm font-medium text-gray-900 dark:text-gray-200">{{ Str::limit($product->name, 32) }}</a>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-900 dark:text-gray-200">{{ $product->price }}</div>

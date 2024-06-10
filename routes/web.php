@@ -25,7 +25,7 @@ Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('car
 Route::get('/products/headphones', [ProductController::class, 'showHeadphones'])->name('products.headphones');
 Route::get('/products/monitors', [ProductController::class, 'showMonitors'])->name('products.monitors');
 Route::get('/products/phones', [ProductController::class, 'showPhones'])->name('products.phones');
-Route::get('/products/search', [ProductController::class, 'search'])->name('products.search'); // Make sure this is outside the auth middleware group
+Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
 Route::middleware('auth')->group(function () {

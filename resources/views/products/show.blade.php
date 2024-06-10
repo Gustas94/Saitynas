@@ -45,9 +45,6 @@
                 @foreach ($product->images as $image)
                 <div>
                     <img src="{{ asset('storage/' . $image->image_path) }}" alt="Product Image" class="w-32 h-32 object-cover">
-                    @if ($image->is_main)
-                    <span class="text-green-500">(Main Image)</span>
-                    @endif
                 </div>
                 @endforeach
             </div>

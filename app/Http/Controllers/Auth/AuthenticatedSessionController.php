@@ -32,7 +32,7 @@ class AuthenticatedSessionController extends Controller
         // Dispatch the UserLoggedIn event
         event(new UserLoggedIn(Auth::user()));
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('index', absolute: false));
     }
 
     /**
