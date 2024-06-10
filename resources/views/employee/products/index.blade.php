@@ -80,6 +80,11 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <a href="{{ route('employee.products.edit', $product->id) }}" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900">Edit</a>
+                        <form action="{{ route('employee.products.destroy', $product->id) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-600 dark:text-red-400 hover:text-red-900 ml-4">Delete</button>
+                        </form>
                     </td>
                 </tr>
                 @endforeach
